@@ -24,7 +24,7 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
     1. [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-Pipeline)
     1. [Exercise 2 - Enforce Encryption of RDS](#exercise-2---enforce-encryption-of-rds)
     1. [Exercise 3 - Enforce Tagging Resource](#exercise-3---enforce-tagging-resource)
-    1. [Exercise 4 - Put in Exception Case Encryption of Databases](#exercise-4---put-in-exception-case-encryption-of-databases)
+    1. [Exercise 4 - Encryption Exception Case for Databases with Public Data](#exercise-4---encryption-exception-case-for-databases-with-public-data)
     1. [Bonus Exercise](#bonus-exercise)
 1. [Next Steps](#next-steps)
 1. [Questions you may have](#questions-you-may-have)
@@ -86,7 +86,7 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
 
 
 ## Working with code locally
-There are many ways to pull the source code to your local machine. We will detail using the command line, but you can choose your preferred method
+There are many ways to pull the source code to your local machine. We will detail using the command line, but you can choose your preferred method.
 
 ### Using the Command Line
 
@@ -246,7 +246,7 @@ Rego supports regex expressions to do the email validation: https://docs.styra.c
 
 _Bonus_ - Some AWS resources do not support tags, for example [Security Hub](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/securityhub_account). What will happen when your policy evaluates the terraform plan for Security Hub? You can uncomment out the terraform for Security Hub in terraform/securityhub and run an plan (or look in [testfiles/aws/securityhub](testfiles/aws/securityhub) ). Will your policy need to be updated to cover this case?
 
-### Exercise 4 - Put in Exception Case Encryption of Databases
+### Exercise 4 - Encryption Exception Case for Databases with Public Data
 In the exercise 2 we ensured our RDS instances were encrypted, but that may not always be required, for example if we are storing public data. We will put in an exception to the encryption requirement if someone has tagged their RDS instance as public.
 1. Open the [terraform/rds/main.tf](terraform/rds/main.tf) files.
 2. Locate the data_classification tag.
