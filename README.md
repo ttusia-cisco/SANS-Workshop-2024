@@ -10,11 +10,11 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
 1. [Prerequisites](#prerequisites)
 1. [Reference Materials](#reference-materials)
 1. [Setup](#setup)
-1. [Working with code locally](#working-with-code-locally)
-    1. [Using the Command Line](#using-the-command-line)
 1. [Development with GitHub Actions](#development-with-github-actions)
 1. [Development with Rego Playground](#development-with-rego-playground)
-1. [Local Development - Optiona](#local-development---optiona)
+1. [Local Development - Optional](#local-development---optiona)
+    1. [Working with code locally](#working-with-code-locally)
+        1. [Using the Command Line](#using-the-command-line)
     1. [Creating terraform output files](#creating-terraform-output-files)
     1. [Options for formatting the json output](#options-for-formatting-the-json-output)
     1. [Evaluating our terraform plan output](#evaluating-our-terraform-plan-output)
@@ -28,14 +28,19 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
     1. [Bonus Exercise](#bonus-exercise)
 1. [Next Steps](#next-steps)
 1. [Questions you may have](#questions-you-may-have)
+1. [Appendix - Local Development - Optional](#appendix---local-development---optional)
+    1. [Working with code locally](#working-with-code-locally)
+    1. [Creating terraform output files](#creating-terraform-output-files)
+    1. [Options for formatting the json output](#options-for-formatting-the-json-output)
+    1. [Evaluating our terraform plan output](#evaluating-our-terraform-plan-output)
 
 ## Prerequisites 
 **Required**
 * Github.com Account
-* Installed locally: git
-* IDE / Code Editor
 
 **Optional**
+* Installed locally: git
+* IDE / Code Editor
 * Installed locally: Docker/Docker Compose OR Podman/Podman Compose
 * Installed locally: Conftest
 * Installed locally: Terraform
@@ -84,104 +89,29 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
 
 :fireworks: _Congrats, you have successfully run your first pipeline action with Policy as Code gating._ :fireworks: 
 
-
-## Working with code locally
-There are many ways to pull the source code to your local machine. We will detail using the command line, but you can choose your preferred method.
-
-### Using the Command Line
-
-**Download the code to your local machine**
-
-Clone the repo to your local machine using your preferred method. From a command prompt run: ```git clone https://github.com/<YOUR_GITHUB_ID>/SANS-Workshop-2024.git```
-
-**Upload the code back to the repository**
-
-When you are ready to commit code back to the repository:
-* cd into the directory you want the code checked out.
-* Run: ```git add .``` stage the code for committing
-* Run: ```git commit -m'updates to workshop'``` to commit the code the change
-* Run ```git push``` to push the code up to the remote repository
-
-Here is what the output will look like:
-```console
-SANS-Workshop-2024$ git add .
-SANS-Workshop-2024$ git commit -m'updates to workshop'
-[main 41a7ade] updates to workshop
- 1 file changed, 65 insertions(+), 20 deletions(-)
-SANS-Workshop-2024$ git push
-Enumerating objects: 5, done.
-Counting objects: 100% (5/5), done.
-Delta compression using up to 8 threads
-Compressing objects: 100% (3/3), done.
-Writing objects: 100% (3/3), 1.69 KiB | 1.69 MiB/s, done.
-Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
-remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
-To github.com:SANS-Workshop/SANS-Workshop-2024.git
-   1109cbc..41a7ade  main -> main
-```
-
-If you committed to a branch with an active PR, you can navigate back to your repository in github.com and see the action executing.
-
-Now you can open the code you just checked out in your preferred IDE.
-
 ##  Development with GitHub Actions
 In our simulated scenario, GitHub actions is our CI tool and also provides the gating for our OPA rules. It runs a containerized environment that executes the terraform plans and OPA validations. Using this we can both gate our work flow as well as test our changes without the need for specific tooling on our local machine.
 
 We walked through initiating an action in the [Setup](#setup) section. We will further want through it in [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-pipeline)
 
+## Working with code in github.dev
+
+With the project open in GitHub, pressing the `.` key on your keyboard a web based IDE will open. 
+
+From the Explorer Menu (<img src="https://i.imgur.com/ZBNtwMZ.png" alt="Explorer Menu" height="15"/>) on the left side, you can view the files in the project.
+
+From the Source Control Menu (<img src="https://i.imgur.com/z4Ca0bx.png" alt="Source Control Menu" height="15"/>) on the left side, you can commit and push changes to the project.
+<br>
+
+From the Source Control Dialog you can add a comment for your commit and push the changes to you project. <br>
+<img src="https://i.imgur.com/CIcvsJ0.png" alt="Source Control Menu" height="100"/>
+
+
 ## Development with Rego Playground
 We can use the [Rego Playground](https://play.openpolicyagent.org/) to do virtual development. We can copy the terraform plan outputs into the input section and work on the policy in the coding section. The rego output is displayed in the outputs and any print statements have display in the browser's developer console.
 
 ## Local Development - Optional
-If you want to debug on your local machine, instead of just leveraging github actions, there are two options:
-* (_Recommended_) [Use the simulated containerized environment](demo-env/README.md)
-* [Setup the each of the tools on your machine and connect to an AWS account](local-debugginf.md)
-
-### Creating terraform output files
-_Note: If you are running locally against a real AWS account replace tflocal with terraform_
-1. Enter the terraform directory containing the terraform with which you are working. For example run: ```cd /workspace/terraform/rds``` or ```cd /workspace/terraform/s3```
-2. Run: ```tflocal init``` to initialize terraform. _If you are familiar with terraform you will notice we are using tflocal instead of terraform. Which is intended to leverage localstack to simulate our AWS account_.
-3. Run: ```tflocal plan --out tfplan.binary``` to create a plan for the terraform file and output it as a binary.
-4. Run: ```tflocal show -json tfplan.binary > tfplan.json``` to generate the json terraform output the we will evaluate with OPA.
-
-
-### Options for formatting the json output
-The output of the ```tflocal/terraform show``` will not have whitespace formatting, making it hard to read, consider using one of the following options to format the code:
-- Use IDEs like VSCode, for example to formant a document right click and select Format and the document will be formatted
-- With jq installed, run: ```jq . tfplan.json > tfplan-pretty.json```
-- Paste the JSON into the following website and have it formatted for you (Note this is not recommend if the terraform output could have sensitive data in it): https://jsonformatter.org/
-
-### Evaluating our terraform plan output
-We use conftest to evaluate the terraform output against our policies.
-
-From the folder where the terraform output was created, run: 
-* For JSON output: ```conftest test --all-namespaces -p /workspace/policies tfplan.json --output json```
-
-The output will state whether the policies written were successful or failed.
-
-Example:
-```json
-[
-        {
-                "filename": "tfplan.json",
-                "namespace": "aws.validation",
-                "successes": 1,
-                "failures": [
-                        {
-                                "msg": "RDS should not specify passwords",
-                                "metadata": {
-                                        "details": {
-                                                "rds_with_password": [
-                                                        "my_db"
-                                                ]
-                                        }
-                                }
-                        }
-                ]
-        }
-]
-```
-
+You can also do development on your local machine. Setting that up is covered in the [Appendix - Local Development - Optional](#appendix---local-development---optional) section. We will  walk through it after we have gone through [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-Pipeline), for those who are interested.
 
 ## Exercises
 
@@ -297,3 +227,91 @@ Things to think about:
 * Why do we do we evaluate the plan vs the terraform directly? Although our examples are very simple, terraform can get complex with levels of indirection through the use of multiple files and modules. The plan is an output of all that combined and gives us a single file for evaluation.
 * Why are my trace statements are not printing. Make sure you are not specifying an output, like ```--output json```, as this will suppress printed messages or trace statements.
 * My tests are passing when they should fail, why? OPA evaluation will silently fail if it gets a null reference. Try using a print statement (```print(<VARIABLE>```) of what you are evaluating to see what is being checked.
+
+
+## Appendix - Local Development - Optional
+If you want to debug on your local machine, instead of just leveraging github actions, there are two options:
+* (_Recommended_) [Use the simulated containerized environment](demo-env/README.md)
+* [Setup the each of the tools on your machine and connect to an AWS account](local-debugging.md)
+
+### Working with code locally
+There are many ways to pull the source code to your local machine. We will detail using the command line, but you can choose your preferred method.
+
+**Command Line - Download the code to your local machine**
+
+Clone the repo to your local machine using your preferred method. From a command prompt run: ```git clone https://github.com/<YOUR_GITHUB_ID>/SANS-Workshop-2024.git```
+
+**Upload the code back to the repository**
+
+When you are ready to commit code back to the repository:
+* cd into the directory you want the code checked out.
+* Run: ```git add .``` stage the code for committing
+* Run: ```git commit -m'updates to workshop'``` to commit the code the change
+* Run ```git push``` to push the code up to the remote repository
+
+Here is what the output will look like:
+```console
+SANS-Workshop-2024$ git add .
+SANS-Workshop-2024$ git commit -m'updates to workshop'
+[main 41a7ade] updates to workshop
+ 1 file changed, 65 insertions(+), 20 deletions(-)
+SANS-Workshop-2024$ git push
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 1.69 KiB | 1.69 MiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To github.com:SANS-Workshop/SANS-Workshop-2024.git
+   1109cbc..41a7ade  main -> main
+```
+
+If you committed to a branch with an active PR, you can navigate back to your repository in github.com and see the action executing.
+
+Now you can open the code you just checked out in your preferred IDE.
+
+### Creating terraform output files
+_Note: If you are running locally against a real AWS account replace tflocal with terraform_
+1. Enter the terraform directory containing the terraform with which you are working. For example run: ```cd /workspace/terraform/rds``` or ```cd /workspace/terraform/s3```
+2. Run: ```tflocal init``` to initialize terraform. _If you are familiar with terraform you will notice we are using tflocal instead of terraform. Which is intended to leverage localstack to simulate our AWS account_.
+3. Run: ```tflocal plan --out tfplan.binary``` to create a plan for the terraform file and output it as a binary.
+4. Run: ```tflocal show -json tfplan.binary > tfplan.json``` to generate the json terraform output the we will evaluate with OPA.
+
+
+### Options for formatting the json output
+The output of the ```tflocal/terraform show``` will not have whitespace formatting, making it hard to read, consider using one of the following options to format the code:
+- Use IDEs like VSCode, for example to formant a document right click and select Format and the document will be formatted
+- With jq installed, run: ```jq . tfplan.json > tfplan-pretty.json```
+- Paste the JSON into the following website and have it formatted for you (Note this is not recommend if the terraform output could have sensitive data in it): https://jsonformatter.org/
+
+### Evaluating our terraform plan output
+We use conftest to evaluate the terraform output against our policies.
+
+From the folder where the terraform output was created, run: 
+* For JSON output: ```conftest test --all-namespaces -p /workspace/policies tfplan.json --output json```
+
+The output will state whether the policies written were successful or failed.
+
+Example:
+```json
+[
+        {
+                "filename": "tfplan.json",
+                "namespace": "aws.validation",
+                "successes": 1,
+                "failures": [
+                        {
+                                "msg": "RDS should not specify passwords",
+                                "metadata": {
+                                        "details": {
+                                                "rds_with_password": [
+                                                        "my_db"
+                                                ]
+                                        }
+                                }
+                        }
+                ]
+        }
+]
+```
