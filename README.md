@@ -103,13 +103,17 @@ From the Source Control Dialog you can add a comment for your commit and push th
 
 
 ### Development with Rego Playground
-We can use the [Rego Playground](https://play.openpolicyagent.org/) to do virtual development. We can copy the terraform plan outputs into the input section and work on the policy in the coding section. The rego output is displayed in the outputs and any print statements have display in the browser's developer console.
+We can use the [Rego Playground](https://play.openpolicyagent.org/) to do virtual development.
+* The terraform plan outputs go into the input section
+* The policy we are working on goes into the coding section. 
+* The rego output is displayed in the outputs.
+* Any print statements are displayed in the browser's developer console.
 <br>
 <img src="https://i.imgur.com/BCuLgYC.png" alt="Source Control Menu" width="500"/>
 
 
 ### Local Development - Optional
-You can also do development on your local machine. Setting that up is covered in the [Appendix - Local Development - Optional](#appendix---local-development---optional) section. We will  walk through it after we have gone through [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-Pipeline), for those who are interested.
+You can also do development on your local machine. Setting that up is covered in the [Appendix - Local Development - Optional](#appendix---local-development---optional) section. We will walk through it after we have gone through [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-Pipeline), for those who are interested.
 
 ## Exercises
 
@@ -257,6 +261,7 @@ Can you add a restriction that enforces that a bucket that is made public and is
 
 Repository Setup:
 * This is just a sample project. Typically the OPA Policies and the terraform would live in separate repositories so the policies can be shared across multiple terraform repos.
+* In this workshop we have built policies and tested them against a failing and passing test case manually. This isn't scalable or automated. With a library of policies we can automate policy validation/testing. [This is explained in the OPA documentation](https://www.openpolicyagent.org/docs/latest/policy-testing/). 
 
 Things to think about:
 * When to use Warn vs Deny vs Violation - You can prefix your policy names based on how you want conftest to handle failures. Think about the behavior you want when you are writing the policies. [Read more here](https://www.conftest.dev/)
