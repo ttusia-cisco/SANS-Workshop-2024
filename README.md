@@ -91,14 +91,14 @@ We walked through initiating an action in the [Setup](#setup) section. We will f
 
 ### Working with code in github.dev
 
-With the project open in GitHub, pressing the `.` key on your keyboard a web based IDE will open. 
+With the project open in GitHub, pressing the `.` key on your keyboard will open a web based IDE. 
 
 From the Explorer Menu (<img src="https://i.imgur.com/ZBNtwMZ.png" alt="Explorer Menu" height="15"/>) on the left side, you can view the files in the project.
 
 From the Source Control Menu (<img src="https://i.imgur.com/z4Ca0bx.png" alt="Source Control Menu" height="15"/>) on the left side, you can commit and push changes to the project.
 <br>
 
-From the Source Control Dialog you can add a comment for your commit and push the changes to you project. <br>
+From the Source Control Dialog you can add a comment for your commit and push the changes to your project. <br>
 <img src="https://i.imgur.com/CIcvsJ0.png" alt="Source Control Menu" height="100"/>
 
 
