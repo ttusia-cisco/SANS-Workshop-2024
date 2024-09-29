@@ -1,8 +1,8 @@
 name: OPA Terraform Validation
-on:  pull_request
+on:  pull_request # only run on PR
 
 jobs:
-  get-working-directories: 
+  get-working-directories: # This section reads in the terraform directories and creates a pipeline for each one
     name: 'Get Terraform Directories'
     runs-on: ubuntu-latest
     outputs:
@@ -17,9 +17,9 @@ jobs:
           echo "terraform_dirs=${DIRS}" 
           echo "terraform_dirs=${DIRS}" >> $GITHUB_OUTPUT
       
-  run-opa-tests:
-    permissions: write-all
+  run-opa-tests: # This is the primary pipeline that runs for each terraform folder
     name: 'Run OPA Tests - ${{ matrix.terraform_dirs }}'
+    permissions: write-all
     needs: [get-working-directories]
     strategy:
       fail-fast: false
@@ -27,52 +27,52 @@ jobs:
         terraform_dirs: ${{ fromJson(needs.get-working-directories.outputs.terraform_dirs) }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Conftest
+      - uses: actions/checkout@v4 # Checks out the code
+      - name: Install Conftest # Installs the policy as code tool -> conftest
         run: |
           wget https://github.com/open-policy-agent/conftest/releases/download/v0.54.0/conftest_0.54.0_linux_amd64.deb
           sudo dpkg -i conftest_0.54.0_linux_amd64.deb
           conftest -v
-      - name: Install terraform-local
+      - name: Install terraform-local # Installs the terraform local tool - used for our simulated AWS environment 
         run: |
           pip install terraform-local
-      - name: Start LocalStack
+      - name: Start LocalStack # Starts up our simulated AWS environment
         uses: LocalStack/setup-localstack@v0.2.2
         with:
           image-tag: 'latest'
-      - name: Terraform Init
+      - name: Terraform Init # Initializes terraform
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: tflocal init
-      - name: Terraform Plan
+      - name: Terraform Plan # Performs terraform plan and creates the output - this output is what is evaluated by conftest (policy as code)
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: |
           tflocal plan -input=false -out tfplan.out
           tflocal show --json tfplan.out > tfplan.json
-      - name: Print Terraform Plan
+      - name: Print Terraform Plan # Formats the terraform plan so it is readable
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: |
           jq . tfplan.json
           jq . tfplan.json > tfplan-pretty-${{ matrix.terraform_dirs }}.json
-      - name: Store Terraform Plan Output
+      - name: Store Terraform Plan Output # Store the terraform output in case we want to dowload it
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan-output-${{ matrix.terraform_dirs }}
           path: ./terraform/${{ matrix.terraform_dirs }}/tfplan.json
-      - name: Validate OPA
+      - name: Validate OPA # Does the OPA (policy as code) validation of the terraform outputs with rego
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: |
           conftest test --all-namespaces -p ../../policies tfplan.json > opa-std-out-${{ matrix.terraform_dirs }}.txt || true
           conftest test --all-namespaces -p ../../policies --trace tfplan.json > opa-trace-${{ matrix.terraform_dirs }}.txt || true
           conftest test --all-namespaces -p ../../policies tfplan.json --output github
-      - name: Print OPA Std Out
+      - name: Print OPA Std Out # Print the OPA/Rego output for debugging
         if: always()
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: cat opa-std-out-${{ matrix.terraform_dirs }}.txt
-      - name: Print OPA Trace
+      - name: Print OPA Trace # Print the OPA/Rego trace statememnts for debugging
         if: always()
         working-directory: ./terraform/${{ matrix.terraform_dirs }}
         run: cat opa-trace-${{ matrix.terraform_dirs }}.txt
-      - name: Store OPA Trace
+      - name: Store OPA Trace # Store the OPA/rego trace output in case we want to dowload it
         if: always()
         uses: actions/upload-artifact@v4
         with:

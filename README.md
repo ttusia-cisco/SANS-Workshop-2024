@@ -10,14 +10,9 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
 1. [Prerequisites](#prerequisites)
 1. [Reference Materials](#reference-materials)
 1. [Setup](#setup)
-1. [Development with GitHub Actions](#development-with-github-actions)
-1. [Development with Rego Playground](#development-with-rego-playground)
-1. [Local Development - Optional](#local-development---optiona)
-    1. [Working with code locally](#working-with-code-locally)
-        1. [Using the Command Line](#using-the-command-line)
-    1. [Creating terraform output files](#creating-terraform-output-files)
-    1. [Options for formatting the json output](#options-for-formatting-the-json-output)
-    1. [Evaluating our terraform plan output](#evaluating-our-terraform-plan-output)
+    1. [Development with GitHub Actions](#development-with-github-actions)
+    1. [Development with Rego Playground](#development-with-rego-playground)
+    1. [Local Development - Optional](#local-development---optional)
 1. [Exercises](#exercises)
     1. [Review the pipeline](#review-the-pipeline)
     1. [Review an OPA Policy](#review-an-opa-policy)
@@ -89,12 +84,12 @@ During this workshop we will complete the [Setup](#setup), [Working with code lo
 
 :fireworks: _Congrats, you have successfully run your first pipeline action with Policy as Code gating._ :fireworks: 
 
-##  Development with GitHub Actions
+###  Development with GitHub Actions
 In our simulated scenario, GitHub actions is our CI tool and also provides the gating for our OPA rules. It runs a containerized environment that executes the terraform plans and OPA validations. Using this we can both gate our work flow as well as test our changes without the need for specific tooling on our local machine.
 
 We walked through initiating an action in the [Setup](#setup) section. We will further want through it in [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-pipeline)
 
-## Working with code in github.dev
+### Working with code in github.dev
 
 With the project open in GitHub, pressing the `.` key on your keyboard a web based IDE will open. 
 
@@ -107,16 +102,53 @@ From the Source Control Dialog you can add a comment for your commit and push th
 <img src="https://i.imgur.com/CIcvsJ0.png" alt="Source Control Menu" height="100"/>
 
 
-## Development with Rego Playground
+### Development with Rego Playground
 We can use the [Rego Playground](https://play.openpolicyagent.org/) to do virtual development. We can copy the terraform plan outputs into the input section and work on the policy in the coding section. The rego output is displayed in the outputs and any print statements have display in the browser's developer console.
 
-## Local Development - Optional
+### Local Development - Optional
 You can also do development on your local machine. Setting that up is covered in the [Appendix - Local Development - Optional](#appendix---local-development---optional) section. We will  walk through it after we have gone through [Exercise 1 - Github Actions and a Failing Pipeline](#exercise-1---github-actions-and-a-failing-Pipeline), for those who are interested.
 
 ## Exercises
 
 ### Review the pipeline
 Github Actions defines a workflow pipeline in [.github/workflows/ci.yml](.github/workflows/ci.yml). Lets take a look at the steps it performs to do validation of the planned Terraform.
+
+``` yaml
+name: OPA Terraform Validation
+on:  pull_request # only run on PR
+
+jobs:
+  get-working-directories: # This section reads in the terraform directories and creates a pipeline for each one
+    ...
+      
+  run-opa-tests: # This is the primary pipeline that runs for each terraform folder
+    name: 'Run OPA Tests - ${{ matrix.terraform_dirs }}'
+    ...
+    steps:
+      - uses: actions/checkout@v4 # Checks out the code
+      - name: Install Conftest # Installs the policy as code tool -> conftest
+        ...
+      - name: Install terraform-local # Installs the terraform local tool - used for our simulated AWS environment 
+        ...
+      - name: Start LocalStack # Starts up our simulated AWS environment
+        ...
+      - name: Terraform Init # Initializes terraform
+        ...
+      - name: Terraform Plan # Performs terraform plan and creates the output - this output is what is evaluated by conftest (policy as code)
+        ...
+      - name: Print Terraform Plan # Formats the terraform plan so it is readable
+        ...
+      - name: Store Terraform Plan Output # Store the terraform output in case we want to dowload it
+       ...
+      - name: Validate OPA # Does the OPA (policy as code) validation of the terraform outputs with rego
+        ...
+      - name: Print OPA Std Out # Print the OPA/Rego output for debugging
+        ...
+      - name: Print OPA Trace # Print the OPA/Rego trace statememnts for debugging
+        ...
+      - name: Store OPA Trace # Store the OPA/rego trace output in case we want to dowload it
+        ...
+```
 
 ### Review an OPA Policy
 There are already two OPA Policy created in:
