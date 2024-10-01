@@ -6,7 +6,7 @@ RUN apk update && \
     ln -sf pip3 /usr/bin/pip && \ 
     ARCH=$(arch)  && \
     ARCH_TERRAFORM=$(arch)  && \
-    if [[ "$ARCH" == "aarch64" ]]; then ARCH="arm64"; fi && \
+    if [[ "$ARCH" == "aarch64" ]]; then ARCH="arm64"; ARCH_TERRAFORM="arm64";  fi && \
     if [[ "$ARCH_TERRAFORM" == "x86_64" ]]; then ARCH_TERRAFORM="amd64"; fi && \
     SYSTEM=$(uname) && \
     echo "https://github.com/open-policy-agent/conftest/releases/download/v0.55.0/conftest_0.55.0_${SYSTEM}_${ARCH}.tar.gz" && \
